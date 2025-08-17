@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/admin/admin_home.dart';
 import 'package:flutter_application_1/student/student_home.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/services/auth_service.dart';
@@ -26,17 +25,11 @@ class _LoginScreenState extends State<LoginScreen> {
       final auth = Provider.of<AuthService>(context, listen: false);
       await auth.login(_emailController.text, _passwordController.text);
 
-      if (auth.isAdmin) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const AdminHome()),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const StudentHome()),
-        );
-      }
+      // Redireciona direto para StudentHome sem verificar se é admin
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const StudentHome()),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
@@ -76,6 +69,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, insira sua senha';
+                  }
+                  if (value.length < 6) {
+                    return 'Senha deve ter pelo menos 6 caracteres';
                   }
                   return null;
                 },
