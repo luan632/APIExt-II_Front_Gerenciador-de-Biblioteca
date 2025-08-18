@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/user.dart';
 import 'package:flutter_application_1/services/auth_service.dart';
 import 'package:provider/provider.dart';
 
@@ -34,8 +33,6 @@ class ProfileScreen extends StatelessWidget {
             Text('Email: ${user.email}'),
             const SizedBox(height: 8),
             Text('Matrícula: ${user.registration}'),
-            const SizedBox(height: 8),
-            Text('Tipo: ${user.type == UserType.admin ? 'Administrador' : 'Aluno'}'),
             const SizedBox(height: 24),
             Center(
               child: ElevatedButton(
