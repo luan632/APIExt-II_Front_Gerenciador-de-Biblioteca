@@ -1,4 +1,4 @@
-enum UserType { admin, student }
+enum UserType { student } // Removido o tipo admin
 
 class User {
   final String id;
@@ -23,7 +23,7 @@ class User {
       name: map['name'],
       email: map['email'],
       registration: map['registration'],
-      type: map['type'] == 'admin' ? UserType.admin : UserType.student,
+      type: UserType.student, // Sempre será student
       photoUrl: map['photoUrl'],
     );
   }
@@ -34,7 +34,7 @@ class User {
       'name': name,
       'email': email,
       'registration': registration,
-      'type': type == UserType.admin ? 'admin' : 'student',
+      'type': 'student', // Sempre retorna 'student'
       'photoUrl': photoUrl,
     };
   }

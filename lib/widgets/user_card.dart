@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/user.dart';
 
-
 class UserCard extends StatelessWidget {
   final User user;
   final VoidCallback onEdit;
@@ -36,7 +35,7 @@ class UserCard extends StatelessWidget {
                   Text(user.name,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   Text(user.email),
-                  Text(user.type == UserType.admin ? 'Administrador' : 'Aluno'),
+                  const Text('Aluno'), // Texto fixo para estudante
                 ],
               ),
             ),
