@@ -32,6 +32,10 @@ class BookService with ChangeNotifier {
 
   List<Book> get books => _books;
 
+  get errorMessage => null;
+
+  Null get isLoading => null;
+
   Book? getBookById(String id) {
     try {
       return _books.firstWhere((book) => book.id == id);
@@ -66,4 +70,6 @@ class BookService with ChangeNotifier {
           book.isbn.toLowerCase().contains(query.toLowerCase());
     }).toList();
   }
+
+  Future<void> fetchBooks() async {}
 }

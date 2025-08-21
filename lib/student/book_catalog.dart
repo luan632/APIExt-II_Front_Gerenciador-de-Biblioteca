@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/book.dart';
 import 'package:flutter_application_1/services/book_service.dart';
 import 'package:flutter_application_1/student/book_detail.dart';
 import 'package:flutter_application_1/widgets/book_card.dart';
-// ignore: unused_import
-import 'package:flutter_application_1/models/book.dart';
 import 'package:provider/provider.dart';
 
 class BookCatalog extends StatefulWidget {
@@ -16,66 +15,16 @@ class BookCatalog extends StatefulWidget {
 }
 
 class _BookCatalogState extends State<BookCatalog> {
-  final _searchController = TextEditingController();
-  final _debounce = Duration(milliseconds: 300); // Para evitar rebuilds muito frequentes
+  final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
+  String _searchQuery = '';
 
   @override
-  Widget build(BuildContext context) {
-    final bookService = Provider.of<BookService>(context);
-    final books = _searchController.text.isEmpty
-        ? bookService.books
-        : bookService.searchBooks(_searchController.text);
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Catálogo de Livros')),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Pesquisar',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-              onChanged: (value) {
-                if (_debounceTimer?.isActive ?? false) {
-                  _debounceTimer?.cancel();
-                }
-                _debounceTimer = Timer(_debounce, () {
-                  setState(() {});
-                });
-              },
-            ),
-          ),
-          Expanded(
-            child: books.isEmpty
-                ? const Center(child: Text('Nenhum livro encontrado'))
-                : ListView.builder(
-                    itemCount: books.length,
-                    itemBuilder: (context, index) {
-                      final book = books[index];
-                      return BookCard(
-                        book: book,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BookDetail(book: book),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
-    );
+  void initState() {
+    super.initState();
+    // Carregar livros ao iniciar (caso necessário)
+    final bookService = Provider.of<BookService>(context, listen: false);
+    bookService.fetchBooks(); // Supondo que você tenha esse método
   }
 
   @override
@@ -83,5 +32,123 @@ class _BookCatalogState extends State<BookCatalog> {
     _searchController.dispose();
     _debounceTimer?.cancel();
     super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    if (_debounceTimer?.isActive ?? false) {
+      _debounceTimer?.cancel();
+    }
+
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() {
+          _searchQuery = value;
+        });
+      }
+    });
+  }
+
+  List<Book> _getFilteredBooks(BookService bookService) {
+    if (_searchQuery.isEmpty) return bookService.books;
+    return bookService.searchBooks(_searchQuery);
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _onSearchChanged,
+        decoration: InputDecoration(
+          hintText: 'Pesquisar livros...',
+          prefixIcon: const Icon(Icons.search, color: Colors.blue),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          hintStyle: const TextStyle(color: Colors.grey),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.blue.shade300, width: 2),
+          ),
+        ),
+        style: const TextStyle(fontSize: 16),
+      ),
+    );
+  }
+
+  Widget _buildBookList(List<Book> books) {
+    if (books.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.library_books_outlined, size: 80, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              _searchQuery.isEmpty ? 'Nenhum livro disponível' : 'Nenhum livro encontrado',
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      itemCount: books.length,
+      separatorBuilder: (_, __) => const Divider(height: 8, color: Colors.transparent),
+      itemBuilder: (context, index) {
+        final book = books[index];
+        return BookCard(
+          book: book,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BookDetail(book: book),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bookService = Provider.of<BookService>(context);
+
+    final filteredBooks = _getFilteredBooks(bookService);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          '📚 Catálogo de Livros',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        elevation: 1,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: Colors.blue,
+      ),
+      body: Column(
+        children: [
+          _buildSearchBar(),
+          Expanded(
+            child: _buildBookList(filteredBooks),
+          ),
+        ],
+      ),
+    );
   }
 }
