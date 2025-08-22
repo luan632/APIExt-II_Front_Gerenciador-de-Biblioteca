@@ -9,32 +9,28 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(           
+      appBar: AppBar(
         title: const Text('Meu Perfil'),
         centerTitle: true,
         elevation: 0,
-        automaticallyImplyLeading: false,
       ),
       body: Consumer<AuthService>(
         builder: (context, auth, child) {
-          if (auth.currentUser == null) {
+          final user = auth.currentUser;
+          if (user == null) {
             return _buildLoadingState();
           }
-          
-          final user = auth.currentUser!;
-          return _buildProfileContent(context, user, auth);
+          return _buildProfileContent(context, user);
         },
       ),
     );
   }
 
   Widget _buildLoadingState() {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
+    return const Center(child: CircularProgressIndicator());
   }
 
-  Widget _buildProfileContent(BuildContext context, User user, AuthService auth) {
+  Widget _buildProfileContent(BuildContext context, User user) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -44,7 +40,7 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 24),
           _buildUserInfoCard(user),
           const SizedBox(height: 32),
-          _buildLogoutButton(context, auth),
+          _buildLogoutButton(context),
         ],
       ),
     );
@@ -59,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
           backgroundColor: Colors.grey.shade200,
           backgroundImage: user.photoUrl != null
               ? NetworkImage(user.photoUrl!)
-              : const AssetImage('assets/default_avatar.png') as ImageProvider,
+              : null,
           child: user.photoUrl == null
               ? const Icon(Icons.person, size: 60, color: Colors.grey)
               : null,
@@ -70,11 +66,7 @@ class ProfileScreen extends StatelessWidget {
             color: Colors.blue,
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.edit,
-            color: Colors.white,
-            size: 18,
-          ),
+          child: const Icon(Icons.edit, color: Colors.white, size: 18),
         ),
       ],
     );
@@ -83,9 +75,7 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildUserInfoCard(User user) {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -114,10 +104,7 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -135,16 +122,13 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context, AuthService auth) {
+  Widget _buildLogoutButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: () => _showLogoutConfirmationDialog(context, auth),
+        onPressed: () => _showLogoutConfirmationDialog(context),
         icon: const Icon(Icons.logout, size: 20),
-        label: const Text(
-          'Sair da Conta',
-          style: TextStyle(fontSize: 16),
-        ),
+        label: const Text('Sair da Conta', style: TextStyle(fontSize: 16)),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
           foregroundColor: Colors.white,
@@ -157,7 +141,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showLogoutConfirmationDialog(BuildContext context, AuthService auth) {
+  void _showLogoutConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -172,13 +156,11 @@ class ProfileScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                final auth = Provider.of<AuthService>(context, listen: false);
                 auth.logout();
-                Navigator.popUntil(context, ModalRoute.withName('/'));
+                Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
               },
-              child: const Text(
-                'Sair',
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text('Sair', style: TextStyle(color: Colors.red)),
             ),
           ],
         );
