@@ -36,6 +36,8 @@ class BookService with ChangeNotifier {
 
   Null get isLoading => null;
 
+  get hasError => null;
+
   Book? getBookById(String id) {
     try {
       return _books.firstWhere((book) => book.id == id);

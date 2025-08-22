@@ -135,19 +135,33 @@ class _BookCatalogState extends State<BookCatalog> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
+            color: Colors.white, // Alterado para branco para contrastar com o gradiente
           ),
         ),
         elevation: 1,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        foregroundColor: Colors.blue,
+        backgroundColor: Colors.transparent, // AppBar transparente para fundo gradiente
+        foregroundColor: Colors.white, // Ícones e botões em branco
+        iconTheme: const IconThemeData(color: Colors.white), // Garante que os ícones sejam brancos
       ),
-      body: Column(
-        children: [
-          _buildSearchBar(),
-          Expanded(
-            child: _buildBookList(filteredBooks),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF1A2980),  // Azul escuro
+              Color(0xFF26D0CE),  // Ciano
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-        ],
+        ),
+        child: Column(
+          children: [
+            _buildSearchBar(),
+            Expanded(
+              child: _buildBookList(filteredBooks),
+            ),
+          ],
+        ),
       ),
     );
   }
