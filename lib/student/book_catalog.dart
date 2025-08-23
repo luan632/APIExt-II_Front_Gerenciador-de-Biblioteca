@@ -130,18 +130,22 @@ class _BookCatalogState extends State<BookCatalog> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
-          '📚 Catálogo de Livros',
+          '📚 Catálogo de Livros 📚',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
-            color: Colors.white, // Alterado para branco para contrastar com o gradiente
+            color: Colors.black,
           ),
         ),
-        elevation: 1,
-        backgroundColor: Colors.transparent, // AppBar transparente para fundo gradiente
-        foregroundColor: Colors.white, // Ícones e botões em branco
-        iconTheme: const IconThemeData(color: Colors.white), // Garante que os ícones sejam brancos
+        elevation: 0, // Removemos a elevação para eliminar qualquer sombra
+        backgroundColor: Colors.blue, // AppBar totalmente transparente
+        foregroundColor: Colors.lightBlueAccent, // Ícones e botões em branco
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
         decoration: const BoxDecoration(
