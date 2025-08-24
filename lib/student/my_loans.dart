@@ -14,21 +14,41 @@ class MyLoans extends StatelessWidget {
     final loans = loanService.getLoansByUser(auth.currentUser!.id);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Meus Empréstimos')),
-      body: loans.isEmpty
-          ? const Center(child: Text('Nenhum empréstimo encontrado'))
-          : ListView.builder(
-              itemCount: loans.length,
-              itemBuilder: (context, index) {
-                final loan = loans[index];
-                return LoanCard(
-                  loan: loan,
-                  onReturn: () {
-                    loanService.returnLoan(loan.id);
-                  },
-                );
-              },
-            ),
+      appBar: AppBar(
+        title: const Text('Meus Empréstimos'),
+        backgroundColor: const Color(0xFF1A2980), // Azul escuro
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF1A2980),  // Azul escuro
+              Color(0xFF26D0CE),  // Ciano
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: loans.isEmpty
+            ? const Center(
+                child: Text(
+                  'Nenhum empréstimo encontrado',
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
+            : ListView.builder(
+                itemCount: loans.length,
+                itemBuilder: (context, index) {
+                  final loan = loans[index];
+                  return LoanCard(
+                    loan: loan,
+                    onReturn: () {
+                      loanService.returnLoan(loan.id);
+                    },
+                  );
+                },
+              ),
+      ),
     );
   }
 }
