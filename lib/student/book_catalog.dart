@@ -143,7 +143,7 @@ class _BookCatalogState extends State<BookCatalog> {
           ),
         ),
         elevation: 0, // Removemos a elevação para eliminar qualquer sombra
-        backgroundColor: Colors.blue, // AppBar totalmente transparente
+        backgroundColor: const Color(0xFF1A2980), // AppBar totalmente transparente
         foregroundColor: Colors.lightBlueAccent, // Ícones e botões em branco
         iconTheme: const IconThemeData(color: Colors.white),
       ),
