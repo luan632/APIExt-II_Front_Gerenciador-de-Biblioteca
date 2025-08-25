@@ -15,15 +15,22 @@ class MyLoans extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meus Empréstimos'),
-        backgroundColor: const Color(0xFF1A2980), // Azul escuro
+        title: const Text(
+          '📚 Meus Empréstimos 📚',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: const Color(0xFF1A2980),
       ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF1A2980),  // Azul escuro
-              Color(0xFF26D0CE),  // Ciano
+              Color(0xFF1A2980), // Azul escuro
+              Color(0xFF26D0CE), // Ciano
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -33,7 +40,11 @@ class MyLoans extends StatelessWidget {
             ? const Center(
                 child: Text(
                   'Nenhum empréstimo encontrado',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                    color: Colors.white,
+                  ),
                 ),
               )
             : ListView.builder(

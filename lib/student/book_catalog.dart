@@ -139,7 +139,7 @@ class _BookCatalogState extends State<BookCatalog> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         elevation: 0, // Removemos a elevação para eliminar qualquer sombra
