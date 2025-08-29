@@ -160,8 +160,8 @@ class StudentHome extends StatelessWidget {
       radius: _avatarRadius,
       backgroundColor: _white,
       backgroundImage: userPhoto != null 
-          ? NetworkImage(userPhoto) as ImageProvider
-          : const AssetImage('assets/default_avatar.png'),
+          ? NetworkImage(userPhoto)
+          : null,
       child: userPhoto == null
           ? const Icon(Icons.person, size: 40, color: Colors.blue)
           : null,
@@ -293,12 +293,13 @@ class StudentHome extends StatelessWidget {
     );
   }
 
+  /// Constrói uma grade de ações com cards interativos para navegação.
   Widget _buildActionGrid(BuildContext context) {
     return GridView.count(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20.0),
       crossAxisCount: 2,
-      crossAxisSpacing: 15,
-      mainAxisSpacing: 15,
+      crossAxisSpacing: 15.0,
+      mainAxisSpacing: 15.0,
       childAspectRatio: 1.1,
       children: [
         _buildActionCard(
@@ -306,21 +307,36 @@ class StudentHome extends StatelessWidget {
           icon: Icons.search_rounded,
           title: 'Buscar Livros',
           color: Colors.blue.shade700,
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BookCatalog())),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const BookCatalog()),
+            );
+          },
         ),
         _buildActionCard(
           context,
           icon: Icons.library_books_rounded,
           title: 'Meus Empréstimos',
           color: Colors.green.shade700,
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MyLoans())),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MyLoans()),
+            );
+          },
         ),
         _buildActionCard(
           context,
           icon: Icons.person_rounded,
           title: 'Meu Perfil',
           color: Colors.purple.shade700,
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+            );
+          },
         ),
         _buildActionCard(
           context,
@@ -333,49 +349,64 @@ class StudentHome extends StatelessWidget {
     );
   }
 
-  Widget _buildActionCard(BuildContext context, {
+  /// Cria um card estilizado com ícone, título e cor personalizada.
+  /// O card tem efeito de gradiente e toque responsivo.
+  Widget _buildActionCard(
+    BuildContext context, {
     required IconData icon,
     required String title,
     required Color color,
     required VoidCallback onTap,
   }) {
+    // Estilo do texto para os títulos
+    final TextStyle textStyle = const TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontSize: 16.0,
+    );
+
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.0),
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.0),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [color.withOpacity(0.8), color],
+              colors: [
+                color.withOpacity(0.8),
+                color,
+              ],
             ),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Ícone centralizado com fundo semi-transparente
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12.0),
                 decoration: BoxDecoration(
                   color: _white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 30, color: _white),
+                child: Icon(
+                  icon,
+                  size: 30.0,
+                  color: _white,
+                ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 15.0),
+              // Título do card
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: _white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                  style: textStyle,
                 ),
               ),
             ],
@@ -385,10 +416,16 @@ class StudentHome extends StatelessWidget {
     );
   }
 
-  // =============== UTILITY METHODS ===============
+  // ==================== MÉTODOS DE APOIO ====================
+
+  /// Exibe um snackbar informando que uma funcionalidade está em desenvolvimento.
   void _showDevelopmentSnackbar(BuildContext context, String featureName) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$featureName em desenvolvimento!')),
+      SnackBar(
+        content: Text('$featureName está em desenvolvimento!'),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.orange.shade800,
+      ),
     );
   }
 }
