@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_application_1/services/auth_service.dart';
 import 'package:flutter_application_1/shared/profile_screen.dart';
 import 'package:flutter_application_1/student/book_catalog.dart';
 import 'package:flutter_application_1/student/my_loans.dart';
-import 'package:provider/provider.dart';
 
 class StudentHome extends StatelessWidget {
   const StudentHome({super.key});
@@ -12,37 +12,10 @@ class StudentHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1A2980),  // Azul escuro
-              Color(0xFF26D0CE),  // Ciano
-            ],
-          ),
-        ),
+        decoration: _buildBackgroundDecoration(),
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            title: const Text('Biblioteca Digital',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            centerTitle: true,
-            iconTheme: const IconThemeData(color: Colors.white),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.notifications_none, color: Colors.white),
-                onPressed: () {
-                  // Adicionar funcionalidade de notificações
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Sistema de notificações em desenvolvimento!')),
-                  );
-                },
-              )
-            ],
-          ),
+          appBar: _buildAppBar(context),
           drawer: _buildCustomDrawer(context),
           body: _buildWelcomeContent(context),
         ),
@@ -50,191 +23,201 @@ class StudentHome extends StatelessWidget {
     );
   }
 
+  // =============== CONSTANTS AND STYLES ===============
+  static const Color _primaryDarkBlue = Color(0xFF1A2980);
+  static const Color _primaryCyan = Color(0xFF26D0CE);
+  static const Color _white = Colors.white;
+  static const Color _white70 = Colors.white70;
+  static const double _drawerWidthFactor = 0.78;
+  static const double _avatarRadius = 40.0;
+  static const double _titleFontSize = 28.0;
+  static const double _subtitleFontSize = 16.0;
+
+  static const TextStyle _appBarTitleStyle = TextStyle(
+    fontWeight: FontWeight.bold,
+    color: _white,
+  );
+
+  static const TextStyle _welcomeTitleStyle = TextStyle(
+    color: _white,
+    fontSize: _titleFontSize,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const TextStyle _welcomeSubtitleStyle = TextStyle(
+    color: _white70,
+    fontSize: _subtitleFontSize,
+  );
+
+  // =============== BACKGROUND DECORATION ===============
+  BoxDecoration _buildBackgroundDecoration() {
+    return const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [_primaryDarkBlue, _primaryCyan],
+      ),
+    );
+  }
+
+  // =============== APP BAR ===============
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text('Biblioteca Digital', style: _appBarTitleStyle),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      centerTitle: true,
+      iconTheme: const IconThemeData(color: _white),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.notifications_none, color: _white),
+          onPressed: () => _showDevelopmentSnackbar(context, 'Sistema de notificações'),
+        ),
+      ],
+    );
+  }
+
+  // =============== CUSTOM DRAWER ===============
   Widget _buildCustomDrawer(BuildContext context) {
-    final authService = Provider.of<AuthService>(context, listen: false);
+    final AuthService authService = Provider.of<AuthService>(context, listen: false);
     final user = authService.currentUser;
-    final userName = user?.displayName ?? 'Aluno';
-    final userEmail = user?.email ?? '';
-    final userPhoto = user?.photoUrl;
+    final String userName = user?.displayName ?? 'Aluno';
+    final String userEmail = user?.email ?? '';
+    final String? userPhoto = user?.photoUrl;
 
     return Drawer(
-      backgroundColor: Colors.white.withOpacity(0.95),
+      backgroundColor: _white.withOpacity(0.95),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.horizontal(right: Radius.circular(25)),
       ),
-      width: MediaQuery.of(context).size.width * 0.78,
+      width: MediaQuery.of(context).size.width * _drawerWidthFactor,
       child: Column(
         children: [
-          // Cabeçalho do Drawer com informações do usuário
-          Container(
-            height: 200,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF1A2980),
-                  Color(0xFF26D0CE),
-                ],
-              ),
-              borderRadius: BorderRadius.only(
-                bottomRight: Radius.circular(30),
-              ),
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 20,
-                  right: 20,
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.white,
-                        backgroundImage: userPhoto != null 
-                            ? NetworkImage(userPhoto) as ImageProvider
-                            : const AssetImage('assets/default_avatar.png'),
-                        child: userPhoto == null
-                            ? const Icon(Icons.person, size: 40, color: Colors.blue)
-                            : null,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        userName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        userEmail,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+          _buildDrawerHeader(context, userPhoto, userName, userEmail),
+          Expanded(
+            child: _buildDrawerMenuItems(context, authService),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawerHeader(BuildContext context, String? userPhoto, String userName, String userEmail) {
+    return Container(
+      height: 200,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_primaryDarkBlue, _primaryCyan],
+        ),
+        borderRadius: BorderRadius.only(bottomRight: Radius.circular(30)),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: 20,
+            right: 20,
+            child: IconButton(
+              icon: const Icon(Icons.close, color: _white),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Item de menu com design aprimorado
-                _buildMenuItem(
-                  context,
-                  icon: Icons.menu_book_rounded,
-                  title: 'Catálogo de Livros',
-                  subtitle: 'Explore nosso acervo',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const BookCatalog()),
-                    );
-                  },
-                ),
-                _buildMenuItem(
-                  context,
-                  icon: Icons.library_books_rounded,
-                  title: 'Meus Empréstimos',
-                  subtitle: 'Ver livros emprestados',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MyLoans()),
-                    );
-                  },
-                ),
-                _buildMenuItem(
-                  context,
-                  icon: Icons.history,
-                  title: 'Histórico',
-                  subtitle: 'Meus empréstimos anteriores',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
-                    );
-                  },
-                ),
-                _buildMenuItem(
-                  context,
-                  icon: Icons.person_rounded,
-                  title: 'Meu Perfil',
-                  subtitle: 'Editar informações pessoais',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                    );
-                  },
-                ),
-                const Divider(indent: 20, endIndent: 20, thickness: 0.5),
-                _buildMenuItem(
-                  context,
-                  icon: Icons.settings_rounded,
-                  title: 'Configurações',
-                  subtitle: 'Personalize sua experiência',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Configurações em desenvolvimento')),
-                    );
-                  },
-                ),
-                _buildMenuItem(
-                  context,
-                  icon: Icons.help_rounded,
-                  title: 'Ajuda & Suporte',
-                  subtitle: 'Tire suas dúvidas',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Central de ajuda em desenvolvimento')),
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-                // Botão de sair com destaque
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.logout, size: 20),
-                      label: const Text('Sair',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      onPressed: () {
-                        authService.logout();
-                        Navigator.popUntil(context, ModalRoute.withName('/'));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
+                _buildUserAvatar(userPhoto),
+                const SizedBox(height: 10),
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    color: _white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  userEmail,
+                  style: const TextStyle(
+                    color: _white70,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildUserAvatar(String? userPhoto) {
+    return CircleAvatar(
+      radius: _avatarRadius,
+      backgroundColor: _white,
+      backgroundImage: userPhoto != null 
+          ? NetworkImage(userPhoto) as ImageProvider
+          : const AssetImage('assets/default_avatar.png'),
+      child: userPhoto == null
+          ? const Icon(Icons.person, size: 40, color: Colors.blue)
+          : null,
+    );
+  }
+
+  Widget _buildDrawerMenuItems(BuildContext context, AuthService authService) {
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+      children: [
+        _buildMenuItem(
+          context,
+          icon: Icons.menu_book_rounded,
+          title: 'Catálogo de Livros',
+          subtitle: 'Explore nosso acervo',
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BookCatalog())),
+        ),
+        _buildMenuItem(
+          context,
+          icon: Icons.library_books_rounded,
+          title: 'Meus Empréstimos',
+          subtitle: 'Ver livros emprestados',
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MyLoans())),
+        ),
+        _buildMenuItem(
+          context,
+          icon: Icons.history,
+          title: 'Histórico',
+          subtitle: 'Meus empréstimos anteriores',
+          onTap: () => _showDevelopmentSnackbar(context, 'Histórico'),
+        ),
+        _buildMenuItem(
+          context,
+          icon: Icons.person_rounded,
+          title: 'Meu Perfil',
+          subtitle: 'Editar informações pessoais',
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())),
+        ),
+        const Divider(indent: 20, endIndent: 20, thickness: 0.5),
+        _buildMenuItem(
+          context,
+          icon: Icons.settings_rounded,
+          title: 'Configurações',
+          subtitle: 'Personalize sua experiência',
+          onTap: () => _showDevelopmentSnackbar(context, 'Configurações'),
+        ),
+        _buildMenuItem(
+          context,
+          icon: Icons.help_rounded,
+          title: 'Ajuda & Suporte',
+          subtitle: 'Tire suas dúvidas',
+          onTap: () => _showDevelopmentSnackbar(context, 'Central de ajuda'),
+        ),
+        const SizedBox(height: 20),
+        _buildLogoutButton(context, authService),
+      ],
     );
   }
 
@@ -258,10 +241,8 @@ class StudentHome extends StatelessWidget {
           ),
           child: Icon(icon, color: Colors.blue.shade700),
         ),
-        title: Text(title,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
         trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
@@ -269,88 +250,84 @@ class StudentHome extends StatelessWidget {
     );
   }
 
+  Widget _buildLogoutButton(BuildContext context, AuthService authService) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          icon: const Icon(Icons.logout, size: 20),
+          label: const Text('Sair', style: TextStyle(fontWeight: FontWeight.bold)),
+          onPressed: () {
+            authService.logout();
+            Navigator.popUntil(context, ModalRoute.withName('/'));
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: _white,
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // =============== WELCOME CONTENT ===============
   Widget _buildWelcomeContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
           padding: EdgeInsets.fromLTRB(25, 20, 25, 10),
-          child: Text(
-            'Olá, Estudante!',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          child: Text('Olá, Estudante!', style: _welcomeTitleStyle),
         ),
         const Padding(
           padding: EdgeInsets.fromLTRB(25, 0, 25, 30),
-          child: Text(
-            'O que você gostaria de fazer hoje?',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
-            ),
-          ),
+          child: Text('O que você gostaria de fazer hoje?', style: _welcomeSubtitleStyle),
         ),
         Expanded(
-          child: GridView.count(
-            padding: const EdgeInsets.all(20),
-            crossAxisCount: 2,
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 15,
-            childAspectRatio: 1.1,
-            children: [
-              _buildActionCard(
-                context,
-                icon: Icons.search_rounded,
-                title: 'Buscar Livros',
-                color: Colors.blue.shade700,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const BookCatalog()),
-                  );
-                },
-              ),
-              _buildActionCard(
-                context,
-                icon: Icons.library_books_rounded,
-                title: 'Meus Empréstimos',
-                color: Colors.green.shade700,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MyLoans()),
-                  );
-                },
-              ),
-              _buildActionCard(
-                context,
-                icon: Icons.person_rounded,
-                title: 'Meu Perfil',
-                color: Colors.purple.shade700,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                  );
-                },
-              ),
-              _buildActionCard(
-                context,
-                icon: Icons.star_rounded,
-                title: 'Recomendações',
-                color: Colors.orange.shade700,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Recomendações em desenvolvimento')),
-                  );
-                },
-              ),
-            ],
-          ),
+          child: _buildActionGrid(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionGrid(BuildContext context) {
+    return GridView.count(
+      padding: const EdgeInsets.all(20),
+      crossAxisCount: 2,
+      crossAxisSpacing: 15,
+      mainAxisSpacing: 15,
+      childAspectRatio: 1.1,
+      children: [
+        _buildActionCard(
+          context,
+          icon: Icons.search_rounded,
+          title: 'Buscar Livros',
+          color: Colors.blue.shade700,
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BookCatalog())),
+        ),
+        _buildActionCard(
+          context,
+          icon: Icons.library_books_rounded,
+          title: 'Meus Empréstimos',
+          color: Colors.green.shade700,
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MyLoans())),
+        ),
+        _buildActionCard(
+          context,
+          icon: Icons.person_rounded,
+          title: 'Meu Perfil',
+          color: Colors.purple.shade700,
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())),
+        ),
+        _buildActionCard(
+          context,
+          icon: Icons.star_rounded,
+          title: 'Recomendações',
+          color: Colors.orange.shade700,
+          onTap: () => _showDevelopmentSnackbar(context, 'Recomendações'),
         ),
       ],
     );
@@ -374,10 +351,7 @@ class StudentHome extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                color.withOpacity(0.8),
-                color,
-              ],
+              colors: [color.withOpacity(0.8), color],
             ),
           ),
           child: Column(
@@ -386,10 +360,10 @@ class StudentHome extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: _white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 30, color: Colors.white),
+                child: Icon(icon, size: 30, color: _white),
               ),
               const SizedBox(height: 15),
               Padding(
@@ -398,7 +372,7 @@ class StudentHome extends StatelessWidget {
                   title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: _white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -408,6 +382,13 @@ class StudentHome extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  // =============== UTILITY METHODS ===============
+  void _showDevelopmentSnackbar(BuildContext context, String featureName) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$featureName em desenvolvimento!')),
     );
   }
 }
