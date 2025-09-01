@@ -1,27 +1,130 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/loan.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/services/auth_service.dart';
+import 'package:flutter_application_1/services/loan_service.dart';
 import 'package:flutter_application_1/shared/profile_screen.dart';
 import 'package:flutter_application_1/student/book_catalog.dart';
 import 'package:flutter_application_1/student/my_loans.dart';
 
-class StudentHome extends StatelessWidget {
-  const StudentHome({super.key});
+// Adicione estas constantes para uso na classe LoanHistory
+const Color _primaryDarkBlue = Color(0xFF1A2980);
+const Color _primaryCyan = Color(0xFF26D0CE);
+const Color _white = Colors.white;
+const TextStyle _appBarTitleStyle = TextStyle(
+  fontWeight: FontWeight.bold,
+  color: _white,
+);
+
+class LoanHistory extends StatelessWidget {
+  const LoanHistory({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loanService = Provider.of<LoanService>(context, listen: false);
+    final completedLoans = loanService.getCompletedLoans();
+
     return Scaffold(
       body: Container(
         decoration: _buildBackgroundDecoration(),
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: _buildAppBar(context),
-          drawer: _buildCustomDrawer(context),
-          body: _buildWelcomeContent(context),
+          appBar: AppBar(
+            title: const Text('Histórico de Empréstimos', style: _appBarTitleStyle),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: true,
+            iconTheme: const IconThemeData(color: _white),
+          ),
+          body: completedLoans.isEmpty
+              ? _buildEmptyState()
+              : _buildLoanList(completedLoans),
         ),
       ),
     );
   }
+
+  BoxDecoration _buildBackgroundDecoration() {
+    return const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [_primaryDarkBlue, _primaryCyan],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.history_rounded, size: 64, color: Colors.white70),
+          const SizedBox(height: 16),
+          Text(
+            'Nenhum empréstimo concluído',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Seus empréstimos anteriores aparecerão aqui',
+            style: TextStyle(color: Colors.white54),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoanList(List<Loan> loans) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: loans.length,
+      itemBuilder: (context, index) {
+        final loan = loans[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            leading: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.book_rounded, color: Colors.blue.shade700),
+            ),
+            title: Text(
+              loan.bookTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Emprestado: ${_formatDate(loan.loanDate)}'),
+                Text('Devolvido: ${_formatDate(loan.returnDate!)}'),
+              ],
+            ),
+            trailing: Icon(Icons.check_circle_rounded, color: Colors.green.shade600),
+          ),
+        );
+      },
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+}
+
+class StudentHome extends StatelessWidget {
+  const StudentHome({super.key});
 
   // =============== CONSTANTS AND STYLES ===============
   static const Color _primaryDarkBlue = Color(0xFF1A2980);
@@ -48,6 +151,21 @@ class StudentHome extends StatelessWidget {
     color: _white70,
     fontSize: _subtitleFontSize,
   );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: _buildBackgroundDecoration(),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: _buildAppBar(context),
+          drawer: _buildCustomDrawer(context),
+          body: _buildWelcomeContent(context),
+        ),
+      ),
+    );
+  }
 
   // =============== BACKGROUND DECORATION ===============
   BoxDecoration _buildBackgroundDecoration() {
@@ -191,7 +309,7 @@ class StudentHome extends StatelessWidget {
           icon: Icons.history,
           title: 'Histórico',
           subtitle: 'Meus empréstimos anteriores',
-          onTap: () => _showDevelopmentSnackbar(context, 'Histórico'),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const LoanHistory())),
         ),
         _buildMenuItem(
           context,
@@ -349,7 +467,7 @@ class StudentHome extends StatelessWidget {
     );
   }
 
-  /// Cria um card estilizado com ícone, título e cor personalizada.
+  /// Cria um card estilizado com ícone, título và cor personalizada.
   /// O card tem efeito de gradiente e toque responsivo.
   Widget _buildActionCard(
     BuildContext context, {

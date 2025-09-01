@@ -313,6 +313,7 @@ class _LoanButton extends StatelessWidget {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         bookId: book.id,
         userId: auth.currentUser!.id,
+        bookTitle: book.title, // CORREÇÃO: Adicionei o bookTitle aqui
         loanDate: DateTime.now(),
         dueDate: DateTime.now().add(const Duration(days: 14)),
         isDigital: book.isDigital,
